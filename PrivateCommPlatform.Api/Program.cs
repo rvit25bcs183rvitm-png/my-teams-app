@@ -200,7 +200,39 @@ using (var scope = app.Services.CreateScope())
 
         var context = services.GetRequiredService<ApplicationDbContext>();
         var passwordHasher = services.GetRequiredService<IPasswordHasher>();
-        await DbInitializer.InitializeAsync(context, passwordHasher);
+        
+        // Retry loop to handle Azure SQL Serverless "Resuming" state (Error 40613) on startup
+        int maxRetries = 6;
+        int delaySeconds = 15;
+        for (int i = 1; i <= maxRetries; i++)
+        {
+            try
+            {
+                appLogger.LogInformation("Attempting database initialization (Attempt {Attempt}/{MaxRetries})...", i, maxRetries);
+                await DbInitializer.InitializeAsync(context, passwordHasher);
+                appLogger.LogInformation("Database initialization completed successfully.");
+                break;
+            }
+            catch (Exception ex) when (i < maxRetries)
+            {
+                // Check if the error is a transient SQL Server connection/resuming issue (like error 40613)
+                bool isTransient = ex.ToString().Contains("40613") || 
+                                   ex.ToString().Contains("database") && ex.ToString().Contains("not currently available") ||
+                                   ex.ToString().Contains("login failed") ||
+                                   ex.ToString().Contains("instance-specific error");
+
+                if (isTransient)
+                {
+                    appLogger.LogWarning(ex, "Database is temporarily unavailable (possibly resuming). Waiting {Delay} seconds before retrying...", delaySeconds);
+                    await Task.Delay(TimeSpan.FromSeconds(delaySeconds));
+                }
+                else
+                {
+                    appLogger.LogError(ex, "Non-transient database error occurred during initialization.");
+                    throw;
+                }
+            }
+        }
     }
     catch (Exception ex)
     {
