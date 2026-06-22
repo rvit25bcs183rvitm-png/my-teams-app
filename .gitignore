@@ -1,0 +1,51 @@
+# Log files
+*.log
+ui_tunnel.log
+api_tunnel.log
+
+# local env/secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+turn secreat.txt
+turn secret.txt
+coturn Mumbai.txt
+
+# .NET core specific
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Node.js specific
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Executables & scripts
+cloudflared.exe
+find_passwords.py
+search_steps*.py
+extract_app*.py
+app_jsx_backup.txt
+all_tool_responses.txt
+all_app_occurrences.txt
+
+# IDE files
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.sln.docstates
+
+# Scratch/temporary files
+scratch/
