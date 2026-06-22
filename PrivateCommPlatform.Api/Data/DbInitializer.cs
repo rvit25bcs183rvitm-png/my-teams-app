@@ -594,6 +594,38 @@ END;
                 }
             }
 
+            // Create user tt with password 123
+            var ttUsername = "tt";
+            var ttNormalized = ttUsername.ToUpperInvariant();
+            if (!await context.Users.AnyAsync(u => u.NormalizedUsername == ttNormalized))
+            {
+                var ttPasswordHash = passwordHasher.HashPassword("123");
+                var ttUser = new User
+                {
+                    Id = Guid.NewGuid(),
+                    Username = ttUsername,
+                    NormalizedUsername = ttNormalized,
+                    DisplayName = "TT User",
+                    FirstName = "TT",
+                    LastName = "User",
+                    Email = "tt@platform.local",
+                    PasswordHash = ttPasswordHash,
+                    AccountStatus = "Active",
+                    IsTemporaryPassword = false,
+                    CreatedDate = DateTimeOffset.UtcNow
+                };
+                
+                var employeeRole = await context.Roles.FirstOrDefaultAsync(r => r.Name == "Employee");
+                if (employeeRole != null)
+                {
+                    ttUser.UserRoles.Add(new UserRole { User = ttUser, Role = employeeRole });
+                }
+                
+                context.Users.Add(ttUser);
+                await context.SaveChangesAsync();
+                Console.WriteLine("BOOTSTRAP: Created user 'tt' with password '123'.");
+            }
+
             // Create sample channels if they don't exist
             if (!await context.Conversations.AnyAsync(c => c.Type == "Channel"))
             {
