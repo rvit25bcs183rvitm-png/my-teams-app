@@ -574,8 +574,8 @@ namespace PrivateCommPlatform.Api.Data
                     .HasForeignKey(e => e.FolderId)
                     .OnDelete(DeleteBehavior.Cascade);
 
-                entity.HasIndex(e => new { e.FileId, e.UserId }).IsUnique().HasFilter("[FileId] IS NOT NULL AND [UserId] IS NOT NULL");
-                entity.HasIndex(e => new { e.FolderId, e.UserId }).IsUnique().HasFilter("[FolderId] IS NOT NULL AND [UserId] IS NOT NULL");
+                entity.HasIndex(e => new { e.FileId, e.UserId }).IsUnique().HasFilter("[file_id] IS NOT NULL AND [user_id] IS NOT NULL");
+                entity.HasIndex(e => new { e.FolderId, e.UserId }).IsUnique().HasFilter("[folder_id] IS NOT NULL AND [user_id] IS NOT NULL");
             });
 
             // FileShare
