@@ -1,0 +1,21 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY ["PrivateCommPlatform.Api/PrivateCommPlatform.Api.csproj", "PrivateCommPlatform.Api/"]
+RUN dotnet restore "PrivateCommPlatform.Api/PrivateCommPlatform.Api.csproj"
+
+COPY . .
+WORKDIR "/src/PrivateCommPlatform.Api"
+RUN dotnet build "PrivateCommPlatform.Api.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "PrivateCommPlatform.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "PrivateCommPlatform.Api.dll"]
