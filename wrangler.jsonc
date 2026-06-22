@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "my-teams-app",
+  "compatibility_date": "2026-06-22",
+  "assets": {
+    "directory": "./PrivateCommPlatform.Ui/dist"
+  },
+  "build": {
+    "command": "npm install --prefix PrivateCommPlatform.Ui && npm run build --prefix PrivateCommPlatform.Ui"
+  },
+  "compatibility_flags": [
+    "nodejs_compat"
+  ]
+}
